@@ -24,8 +24,8 @@ function atom:new()
     end
     return obj
 end
+local particles = {}
 function love.load()
-    particles = {}
     for i = 1, 10 do
         particles[i] = atom:new()
     end
