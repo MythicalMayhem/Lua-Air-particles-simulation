@@ -1,8 +1,0 @@
-{
-    "robloxLsp.diagnostics.disable": [
-        //"undefined-global"
-    ],
-    "robloxLsp.diagnostics.globals": [
-        "love"
-    ]
-}
