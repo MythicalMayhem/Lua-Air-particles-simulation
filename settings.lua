@@ -1,5 +1,5 @@
 return {
-    gasCloud = 100,
+    gasCloud = 100 ,
     display = {
         winHeight = 720,
         winWidth = 1200,

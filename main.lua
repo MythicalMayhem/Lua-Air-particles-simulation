@@ -4,6 +4,9 @@ local physics = require('./physics')
 local templates = require('./templates')
 math.randomseed(os.time())
 local printstr = ''
+
+local n = settings.gasCloud
+local atoms = {}
 function collisionCheck(a, b)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
     if distance <= (a.radius + b.radius) then
@@ -13,8 +16,15 @@ function collisionCheck(a, b)
         b.pos.x = b.pos.x + b.velocity.x
         b.pos.y = b.pos.y + b.velocity.y
     end
+end 
+function combine(a,b,i,j)
+    local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
+    if distance <=2 then
+         table.remove(atoms,j)
+         a.mass = a.mass +1 
+         a.radius = a.radius + 50/n
+    end
 end
-local atoms = {}
 
 local BB = math.random(0, love.graphics.getHeight() - 1)
 local line = {
@@ -32,7 +42,7 @@ function love.load()
     -- y = ax +b
 
     local sign = -1
-    local n = 100
+   
     local chunk = (line.x2 - line.x - 200) / n
     for i = 1, n do
         sign = -sign
@@ -51,7 +61,7 @@ function love.load()
 end
 
 -- ! sin function for vibration
--- ! collision funtion not working 
+-- ! add force going to the center 
 
 local fps = 0
 local debounce = os.time()
@@ -78,24 +88,24 @@ function love.update(dt)
                 local dx = atom.pos.x - neighbor.pos.x
                 local dy = atom.pos.y - neighbor.pos.y
                 local d = math.sqrt(dx * dx + dy * dy)
-                if (d > 1) and (d < 80) then
+                if (d > 1) and (d < 30) then
                     local F = -1 / d
                     fx = fx + F * dx
                     fy = fy + F * dy
                 end
             end
         end
-        atom.velocity.x =(atom.velocity.x + fx) * dt
-        atom.velocity.y =(atom.velocity.y + fy) * dt
+        atom.velocity.x = (atom.velocity.x + fx) * dt
+        atom.velocity.y = (atom.velocity.y + fy) * dt
         for l, neighbor in pairs(atoms) do
             if not (l == i) then
-
                 collisionCheck(atom, neighbor, dt)
+                combine(atom, neighbor,i,l)
             end
         end
         printstr = atom.velocity.x
-        atom.pos.x = atom.pos.x +atom.velocity.x
-        atom.pos.y = atom.pos.y +  atom.velocity.y 
+        atom.pos.x = atom.pos.x + atom.velocity.x
+        atom.pos.y = atom.pos.y + atom.velocity.y
     end
 end
 
