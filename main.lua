@@ -9,7 +9,7 @@ local n = settings.gasCloud
 local atoms = {}
 function collisionCheck(a, b)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
-    if distance <= (a.radius + b.radius)   then
+    if distance <= (a.radius + b.radius) then
         a.velocity.x, a.velocity.y, b.velocity.x, b.velocity.y = physics.response_velocities(a, b)
         a.pos.x = a.pos.x + a.velocity.x
         a.pos.y = a.pos.y + a.velocity.y
@@ -19,7 +19,7 @@ function collisionCheck(a, b)
 end
 function combine(a, b, i, j)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
-    if (distance <= (a.radius + b.radius) - 1 )  then
+    if (distance <= (a.radius + b.radius) - 1) then
         if a.mass > b.mass then
             a.mass = a.mass + b.mass
             a.radius = a.radius + 1
@@ -68,9 +68,6 @@ function love.load()
     end
 end
 
--- ! sin function for vibration
--- ! add force going to the center 
-
 local fps = 0
 local debounce = os.time()
 function love.update(dt)
@@ -94,11 +91,11 @@ function love.update(dt)
                 end
             end
         end
-        atom.velocity.x = atom.velocity.x  
-        atom.velocity.y = atom.velocity.y  
+        atom.velocity.x = atom.velocity.x
+        atom.velocity.y = atom.velocity.y
         for l, neighbor in pairs(atoms) do
             if not (l == i) then
-                collisionCheck(atom, neighbor, dt)
+                collisionCheck(atom, neighbor)
                 combine(atom, neighbor, i, l)
             end
         end
@@ -109,8 +106,8 @@ function love.update(dt)
         if not ((atom.pos.y - atom.radius >= 0) and (atom.pos.y + atom.radius <= love.graphics.getHeight())) then
             atom.velocity.y = atom.velocity.y * -1
         end
-        atom.pos.x = utils.clamp(atom.pos.x + atom.velocity.x,0,love.graphics.getWidth())
-        atom.pos.y = utils.clamp(atom.pos.y + atom.velocity.y,0,love.graphics.getHeight())
+        atom.pos.x = utils.clamp(atom.pos.x + atom.velocity.x, 0, love.graphics.getWidth())
+        atom.pos.y = utils.clamp(atom.pos.y + atom.velocity.y, 0, love.graphics.getHeight())
     end
 end
 
