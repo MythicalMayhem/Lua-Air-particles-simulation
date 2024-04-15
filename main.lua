@@ -9,20 +9,29 @@ local n = settings.gasCloud
 local atoms = {}
 function collisionCheck(a, b)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
-    if distance <= (a.radius + b.radius) then
+    if distance <= (a.radius + b.radius)   then
         a.velocity.x, a.velocity.y, b.velocity.x, b.velocity.y = physics.response_velocities(a, b)
         a.pos.x = a.pos.x + a.velocity.x
         a.pos.y = a.pos.y + a.velocity.y
         b.pos.x = b.pos.x + b.velocity.x
         b.pos.y = b.pos.y + b.velocity.y
     end
-end 
-function combine(a,b,i,j)
+end
+function combine(a, b, i, j)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
-    if distance <=2 then
-         table.remove(atoms,j)
-         a.mass = a.mass +1 
-         a.radius = a.radius + 50/n
+    if (distance <= (a.radius + b.radius) - 1 )  then
+        if a.mass > b.mass then
+            a.mass = a.mass + b.mass
+            a.radius = a.radius + 1
+            printstr = a.mass
+            table.remove(atoms, j)
+        else
+            b.mass = b.mass + a.mass
+            b.radius = b.radius + 1
+            printstr = b.mass
+            table.remove(atoms, i)
+
+        end
     end
 end
 
@@ -42,7 +51,7 @@ function love.load()
     -- y = ax +b
 
     local sign = -1
-   
+
     local chunk = (line.x2 - line.x - 200) / n
     for i = 1, n do
         sign = -sign
@@ -55,7 +64,6 @@ function love.load()
         temp.pos.y = math.min(love.graphics.getHeight(), y)
         if not (temp.x == love.graphics.getWidth() or temp.y == love.graphics.getHeight()) then
             atoms[i] = temp
-
         end
     end
 end
@@ -72,40 +80,37 @@ function love.update(dt)
     end
     for i, atom in pairs(atoms) do
 
-        local nextStep = {
-            x = atom.pos.x + atom.mass * utils.sign(atom.velocity.x),
-            y = atom.pos.y + atom.mass * utils.sign(atom.velocity.y)
-        }
-        if not ((nextStep.x >= 0) and (nextStep.x <= love.graphics.getWidth())) then
-            atom.velocity.x = atom.velocity.x * -1
-        end
-        if not ((nextStep.y >= 0) and (nextStep.y <= love.graphics.getHeight())) then
-            atom.velocity.y = atom.velocity.y * -1
-        end
         local fx, fy = 0, 0
         for l, neighbor in pairs(atoms) do
             if not (l == i) then
                 local dx = atom.pos.x - neighbor.pos.x
                 local dy = atom.pos.y - neighbor.pos.y
+
                 local d = math.sqrt(dx * dx + dy * dy)
-                if (d > 1) and (d < 30) then
+                if (d > 1) and (d < 5) then
                     local F = -1 / d
                     fx = fx + F * dx
                     fy = fy + F * dy
                 end
             end
         end
-        atom.velocity.x = (atom.velocity.x + fx) * dt
-        atom.velocity.y = (atom.velocity.y + fy) * dt
+        atom.velocity.x = atom.velocity.x  
+        atom.velocity.y = atom.velocity.y  
         for l, neighbor in pairs(atoms) do
             if not (l == i) then
                 collisionCheck(atom, neighbor, dt)
-                combine(atom, neighbor,i,l)
+                combine(atom, neighbor, i, l)
             end
         end
-        printstr = atom.velocity.x
-        atom.pos.x = atom.pos.x + atom.velocity.x
-        atom.pos.y = atom.pos.y + atom.velocity.y
+
+        if not ((atom.pos.x - atom.radius >= 0) and (atom.pos.x + atom.radius <= love.graphics.getWidth())) then
+            atom.velocity.x = atom.velocity.x * -1
+        end
+        if not ((atom.pos.y - atom.radius >= 0) and (atom.pos.y + atom.radius <= love.graphics.getHeight())) then
+            atom.velocity.y = atom.velocity.y * -1
+        end
+        atom.pos.x = utils.clamp(atom.pos.x + atom.velocity.x,0,love.graphics.getWidth())
+        atom.pos.y = utils.clamp(atom.pos.y + atom.velocity.y,0,love.graphics.getHeight())
     end
 end
 
