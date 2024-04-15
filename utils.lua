@@ -88,4 +88,13 @@ function utils.sign(a)
     elseif a >0 then return 1
     else return 0 end
 end
+ function utils.clamp(a, min, max)
+    if a > max then
+        return max
+    elseif a < min then
+        return min
+    else
+        return a
+    end
+end
 return utils

@@ -15,34 +15,31 @@ function collisionCheck(a, b)
     end
 end
 local atoms = {}
- 
+
 local BB = math.random(0, love.graphics.getHeight() - 1)
 local line = {
     b = BB,
-    a  = (love.graphics.getHeight() - BB - BB) / (love.graphics.getWidth() - 0),
+    a = (love.graphics.getHeight() - BB - BB) / (love.graphics.getWidth() - 0),
     x = 0,
     y = BB,
     x2 = love.graphics.getWidth(),
-    y2 = love.graphics.getHeight() - BB,
+    y2 = love.graphics.getHeight() - BB
 
 }
 
-
 function love.load()
- 
-      -- y = ax +b
 
+    -- y = ax +b
 
     local sign = -1
     local n = 100
-    local chunk = (line.x2 - line.x-200 ) / n
+    local chunk = (line.x2 - line.x - 200) / n
     for i = 1, n do
         sign = -sign
         local margin = math.random(-50, 50)
         local temp = templates.hydrogen:new()
         local x = chunk * i + 100
         local y = line.a * x + line.b + ((n / 2) - math.abs((n / 2) - i)) * sign + margin
-
 
         temp.pos.x = math.min(love.graphics.getWidth(), x)
         temp.pos.y = math.min(love.graphics.getHeight(), y)
@@ -73,23 +70,37 @@ function love.update(dt)
         if not ((nextStep.y >= 0) and (nextStep.y <= love.graphics.getHeight())) then
             atom.velocity.y = atom.velocity.y * -1
         end
+        local fx = 0
+        local fy = 0
         for l, neighbor in pairs(atoms) do
             if not (neighbor == atom) then
-                collisionCheck(atom, neighbor)
+                --collisionCheck(atom, neighbor, dt)
+
+                local dx, dy, F = physics.gForce(atom, neighbor)
+                local d = math.sqrt(dx * dx + dy * dy)
+
+                if d < 10 then
+                    fx = fx + F * dx
+                    fy = fy + F * dy
+                    atom.velocity.x = atom.velocity.x + fx
+                    atom.velocity.y = atom.velocity.y + fy
+                end
             end
         end
-        atom.pos.x = atom.pos.x + atom.velocity.x
-        atom.pos.y = atom.pos.y + atom.velocity.y
+        printstr = atom.velocity.x
+        atom.pos.x = atom.pos.x + utils.clamp(atom.velocity.x,-1,1)
+        atom.pos.y = atom.pos.y + utils.clamp(atom.velocity.y,-1,1)
     end
 end
+
 
 function love.draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.print(tostring(fps))
     love.graphics.print(tostring('\n' .. printstr))
-    love.graphics.line( line.x,line.y,line.x2,line.y2 )
+    -- love.graphics.line(line.x, line.y, line.x2, line.y2)
     for k, atom in ipairs(atoms) do
         love.graphics.setColor(atom.color[1], atom.color[2], atom.color[3])
-        love.graphics.circle("fill", atom.pos.x, atom.pos.y, atom.mass)
+        love.graphics.circle("fill", atom.pos.x, atom.pos.y, atom.mass*5)
     end
 end
