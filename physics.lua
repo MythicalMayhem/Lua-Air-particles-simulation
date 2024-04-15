@@ -12,7 +12,6 @@ function physics.gForce(atom, neighbor)
     local dx = atom.pos.x - neighbor.pos.x
     local dy = atom.pos.y - neighbor.pos.y
     local d = math.sqrt(dx * dx + dy * dy)
-    
     local F = -(atom.mass * neighbor.mass) / (d ^ 2)
     return dx,dy,F
 end

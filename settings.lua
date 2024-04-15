@@ -3,7 +3,7 @@ return {
     display = {
         winHeight = 720,
         winWidth = 1200,
-        winName = 'ParticleSimulator',
+        winName = 'Particle Simulator',
         fullscreen = false
     }
 }

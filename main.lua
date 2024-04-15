@@ -84,15 +84,15 @@ function love.update(dt)
                 local dy = atom.pos.y - neighbor.pos.y
 
                 local d = math.sqrt(dx * dx + dy * dy)
-                if (d > 1) and (d < 5) then
+                if (d > 1) and d < 25 then
                     local F = -1 / d
                     fx = fx + F * dx
                     fy = fy + F * dy
                 end
             end
-        end
-        atom.velocity.x = atom.velocity.x
-        atom.velocity.y = atom.velocity.y
+        end  
+        atom.velocity.x = atom.velocity.x + fx * dt
+        atom.velocity.y = atom.velocity.y + fx * dt
         for l, neighbor in pairs(atoms) do
             if not (l == i) then
                 collisionCheck(atom, neighbor)
