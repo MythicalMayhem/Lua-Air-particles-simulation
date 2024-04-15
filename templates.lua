@@ -3,7 +3,8 @@ atoms.hydrogen = {}
 function atoms.hydrogen:new()
     local obj = {}
     obj.color = {math.random(), math.random(), math.random()}
-    obj.mass =  2 --× 10^-24 g
+    obj.mass =  1 --× 10^-24 g
+    obj.radius =  2 --× 10^-24 g
     obj.pos = {
         x = math.random(0 + obj.mass, love.graphics.getWidth() - obj.mass),
         y = math.random(0 + obj.mass, love.graphics.getHeight() - obj.mass)

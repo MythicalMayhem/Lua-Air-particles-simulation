@@ -6,7 +6,7 @@ math.randomseed(os.time())
 local printstr = ''
 function collisionCheck(a, b)
     local distance = math.sqrt((a.pos.x - b.pos.x) ^ 2 + (a.pos.y - b.pos.y) ^ 2)
-    if distance <= (a.mass + b.mass) then
+    if distance <= (a.radius + b.radius) then
         a.velocity.x, a.velocity.y, b.velocity.x, b.velocity.y = physics.response_velocities(a, b)
         a.pos.x = a.pos.x + a.velocity.x
         a.pos.y = a.pos.y + a.velocity.y
@@ -50,6 +50,9 @@ function love.load()
     end
 end
 
+-- ! sin function for vibration
+-- ! collision funtion not working 
+
 local fps = 0
 local debounce = os.time()
 function love.update(dt)
@@ -57,8 +60,7 @@ function love.update(dt)
         fps = 1 / dt
         debounce = os.time()
     end
-    for k, atom in pairs(atoms) do
-        local dir = atom.direction()
+    for i, atom in pairs(atoms) do
 
         local nextStep = {
             x = atom.pos.x + atom.mass * utils.sign(atom.velocity.x),
@@ -70,29 +72,32 @@ function love.update(dt)
         if not ((nextStep.y >= 0) and (nextStep.y <= love.graphics.getHeight())) then
             atom.velocity.y = atom.velocity.y * -1
         end
-        local fx = 0
-        local fy = 0
+        local fx, fy = 0, 0
         for l, neighbor in pairs(atoms) do
-            if not (neighbor == atom) then
-                --collisionCheck(atom, neighbor, dt)
-
-                local dx, dy, F = physics.gForce(atom, neighbor)
+            if not (l == i) then
+                local dx = atom.pos.x - neighbor.pos.x
+                local dy = atom.pos.y - neighbor.pos.y
                 local d = math.sqrt(dx * dx + dy * dy)
-
-                if d < 10 then
+                if (d > 1) and (d < 80) then
+                    local F = -1 / d
                     fx = fx + F * dx
                     fy = fy + F * dy
-                    atom.velocity.x = atom.velocity.x + fx
-                    atom.velocity.y = atom.velocity.y + fy
                 end
             end
         end
+        atom.velocity.x =(atom.velocity.x + fx) * dt
+        atom.velocity.y =(atom.velocity.y + fy) * dt
+        for l, neighbor in pairs(atoms) do
+            if not (l == i) then
+
+                collisionCheck(atom, neighbor, dt)
+            end
+        end
         printstr = atom.velocity.x
-        atom.pos.x = atom.pos.x + utils.clamp(atom.velocity.x,-1,1)
-        atom.pos.y = atom.pos.y + utils.clamp(atom.velocity.y,-1,1)
+        atom.pos.x = atom.pos.x +atom.velocity.x
+        atom.pos.y = atom.pos.y +  atom.velocity.y 
     end
 end
-
 
 function love.draw()
     love.graphics.setColor(1, 1, 1)
@@ -101,6 +106,6 @@ function love.draw()
     -- love.graphics.line(line.x, line.y, line.x2, line.y2)
     for k, atom in ipairs(atoms) do
         love.graphics.setColor(atom.color[1], atom.color[2], atom.color[3])
-        love.graphics.circle("fill", atom.pos.x, atom.pos.y, atom.mass*5)
+        love.graphics.circle("fill", atom.pos.x, atom.pos.y, atom.radius)
     end
 end
