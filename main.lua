@@ -1,7 +1,7 @@
-local utils = require('./utils')
+local templates = require('./templates')
 local settings = require('./settings')
 local physics = require('./physics')
-local templates = require('./templates')
+local utils = require('./utils')
 math.randomseed(os.time())
 local printstr = ''
 
@@ -35,7 +35,7 @@ function combine(a, b, i, j)
     end
 end
  
-love.window.setMode(settings.display.winWidth, settings.display.winHeight)
+--love.window.setMode(settings.display.winWidth, settings.display.winHeight)
 local line = {}
 line.b = math.random(0, love.graphics.getHeight() - 1)
 line.a = (love.graphics.getHeight() - line.b - line.b) / (love.graphics.getWidth() - 0)
@@ -58,9 +58,9 @@ function love.load()
         local x = chunk * i + padding
         local y = line.a * x + line.b + ((n / 2) - math.abs((n / 2) - i)) * sign + margin
 
-        temp.pos.x = math.min(love.graphics.getWidth(), x)
-        temp.pos.y = math.min(love.graphics.getHeight(), y)
-        if not (temp.x == love.graphics.getWidth() or temp.y == love.graphics.getHeight()) then
+        temp.pos.x = math.min(settings.display.winWidth, x)
+        temp.pos.y = math.min(settings.display.winHeight, y)
+        if not (temp.x == settings.display.winWidth or temp.y == settings.display.winHeight) then
             atoms[i] = temp
         end
     end
@@ -97,7 +97,6 @@ function love.update(dt)
                 combine(atom, neighbor, i, l)
             end
         end
-
         if not ((atom.pos.x - atom.radius >= 0) and (atom.pos.x + atom.radius <= love.graphics.getWidth())) then
             atom.velocity.x = atom.velocity.x * -1
         end
