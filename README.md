@@ -1,10 +1,10 @@
-# Particle physics simulator
+# Air particles physics simulator
 <center>
 <small>never realized how awesome lua is </small><br>
     <img src = './readme/preview.gif'>
 </center>
-Simple Particle Physics simulator using Lua which includes few laws of physics<br>
-
+Simple Particle Physics simulator to simulate air particles  using Lua which includes few laws of physics<br>
+collision detection is made using aabb
 - <a style='color:white;text-decoration:underline' href='https://en.wikipedia.org/wiki/Elastic_collision'>Elastic collision </a>
 <br>
 <img style='background-color:white' src='./readme/elastic_collision.svg'>
